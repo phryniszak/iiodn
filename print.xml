@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE context [<!ELEMENT context (device | context-attribute)*><!ELEMENT context-attribute EMPTY><!ELEMENT device (channel | attribute | debug-attribute | buffer-attribute)*><!ELEMENT channel (scan-element?, attribute*)><!ELEMENT attribute EMPTY><!ELEMENT scan-element EMPTY><!ELEMENT debug-attribute EMPTY><!ELEMENT buffer-attribute EMPTY><!ATTLIST context name CDATA #REQUIRED description CDATA #IMPLIED><!ATTLIST context-attribute name CDATA #REQUIRED value CDATA #REQUIRED><!ATTLIST device id CDATA #REQUIRED name CDATA #IMPLIED><!ATTLIST channel id CDATA #REQUIRED type (input|output) #REQUIRED name CDATA #IMPLIED><!ATTLIST scan-element index CDATA #REQUIRED format CDATA #REQUIRED scale CDATA #IMPLIED><!ATTLIST attribute name CDATA #REQUIRED filename CDATA #IMPLIED><!ATTLIST debug-attribute name CDATA #REQUIRED><!ATTLIST buffer-attribute name CDATA #REQUIRED>]>
+<context name="local" description="Linux raspberrypi 4.19.118 #1 Tue Jun 16 00:18:42 IST 2020 armv6l">
+    <context-attribute name="local,kernel" value="4.19.118" />
+    <device id="iio:device0" name="ads1015">
+        <channel id="voltage0-voltage1" type="input">
+            <scan-element index="0" format="le:s12/16&gt;&gt;4" scale="3.000000" />
+            <attribute name="raw" filename="in_voltage0-voltage1_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage0-voltage1_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage0-voltage1_scale" />
+        </channel>
+        <channel id="voltage0-voltage3" type="input">
+            <scan-element index="1" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage0-voltage3_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage0-voltage3_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage0-voltage3_scale" />
+        </channel>
+        <channel id="voltage1-voltage3" type="input">
+            <scan-element index="2" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage1-voltage3_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage1-voltage3_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage1-voltage3_scale" />
+        </channel>
+        <channel id="voltage2-voltage3" type="input">
+            <scan-element index="3" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage2-voltage3_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage2-voltage3_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage2-voltage3_scale" />
+        </channel>
+        <channel id="voltage0" type="input">
+            <scan-element index="4" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage0_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage0_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage0_scale" />
+        </channel>
+        <channel id="voltage1" type="input">
+            <scan-element index="5" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage1_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage1_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage1_scale" />
+        </channel>
+        <channel id="voltage2" type="input">
+            <scan-element index="6" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage2_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage2_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage2_scale" />
+        </channel>
+        <channel id="voltage3" type="input">
+            <scan-element index="7" format="le:s12/16&gt;&gt;4" scale="1.000000" />
+            <attribute name="raw" filename="in_voltage3_raw" />
+            <attribute name="sampling_frequency" filename="in_voltage3_sampling_frequency" />
+            <attribute name="scale" filename="in_voltage3_scale" />
+        </channel>
+        <channel id="timestamp" type="input">
+            <scan-element index="8" format="le:S64/64&gt;&gt;0" />
+        </channel>
+        <attribute name="current_timestamp_clock" />
+        <attribute name="sampling_frequency_available" />
+        <attribute name="scale_available" />
+        <buffer-attribute name="data_available" />
+        <buffer-attribute name="watermark" />
+    </device>
+</context>

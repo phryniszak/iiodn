@@ -13,7 +13,7 @@
             ],
             "program": "${workspaceFolder}/app.js",
             "env": {
-                "DEBUG": "IIODClient"
+                "DEBUG": "IIOD*"
             },
             "outputCapture": "std"
         }

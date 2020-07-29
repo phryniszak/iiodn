@@ -5,7 +5,9 @@ const debug = require("debug")("IIODClient");
 
 const Parser = require("./lib/iiod-parser");
 const Command = require("./lib/command");
-const COMMAND_CODES = require("./lib/command_codes");
+const COMMAND = require("./lib/iiod-enums").CMD;
+
+// https://wiki.analog.com/resources/tools-software/linux-software/libiio_internals
 
 class IIODClient extends EventEmitter {
 
@@ -270,26 +272,53 @@ class IIODClient extends EventEmitter {
         this.retry_attempts_cnt = 0;
     }
 
-    // Do not call internal_send_command directly, if you are not absolutly certain it handles everything properly
-    // e.g. monitor / info does not work with internal_send_command only
+    //
+    //
+    //
     internal_send_command(command_obj) {
-        // var arg, prefix_keys;
-        // var i = 0;
+
+        var i = 0;
         var command_str = "";
-        // var args = command_obj.args;
-        var command = command_obj.command + "\r\n";
-        // var len = args.length;
-        // var args_copy = new Array(len);
+        const args = command_obj.args;
+        const command = command_obj.command; // + "\r\n";
+        const len = args.length;
+        const args_copy = new Array(len);
 
         if (process.domain && command_obj.callback) {
             command_obj.callback = process.domain.bind(command_obj.callback);
         }
 
-        // for (i = 0; i < len; i += 1) {
-        //     arg = args_copy[i];
-        //     command_str += '$' + Buffer.byteLength(arg) + '\r\n' + arg + '\r\n';
-        // }
-        command_str = command;
+        if (this.ready === false || this.stream.writable === false) {
+            debug("not ready for write");
+            return false;
+        }
+
+        for (i = 0; i < len; i += 1) {
+            if (typeof args[i] === "string") {
+                args_copy[i] = args[i];
+            } else if (typeof args[i] === "number") {
+                args_copy[i] = `${args[i]}`;
+            } else {
+                var invalidArgError = new Error("IIODClient: The " + command.toUpperCase() + " command contains a invalid argument type.");
+                invalidArgError.command = command_obj.command.toUpperCase();
+                if (command_obj.args && command_obj.args.length) {
+                    invalidArgError.args = command_obj.args;
+                }
+                if (command_obj.callback) {
+                    command_obj.callback(invalidArgError);
+                    return false;
+                }
+                throw invalidArgError;
+            }
+        }
+
+        command_str += command;
+
+        for (i = 0; i < len; i += 1) {
+            command_str += " " + args_copy[i];
+        }
+
+        command_str += "\r\n";
 
         debug(`Send ${this.address} id ${IIODClient.connection_id}: ${command_str}`);
         this.stream.write(command_str);
@@ -347,21 +376,41 @@ class IIODClient extends EventEmitter {
 
 
     // //////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     //
     //
     //
     version(callback) {
-        return this.internal_send_command(new Command(COMMAND_CODES.VERSION, [], callback));
+        return this.internal_send_command(new Command(COMMAND.VERSION, [], callback));
     }
 
     //
     //
     //
     print(callback) {
-        return this.internal_send_command(new Command(COMMAND_CODES.PRINT, [], callback));
+        return this.internal_send_command(new Command(COMMAND.PRINT, [], callback));
     }
 
+    //
+    //
+    //
+    timeout(timeout_ms, callback) {
+        return this.internal_send_command(new Command(COMMAND.TIMEOUT, [timeout_ms], callback));
+    }
+
+    //
+    //
+    //
+    gettrig(device, callback) {
+        return this.internal_send_command(new Command(COMMAND.GETTRIG, [device], callback));
+    }
+
+    //
+    //
+    //
+    read(device, io, channel, attribute, callback) {
+        return this.internal_send_command(new Command(COMMAND.READ, [device, io, channel, attribute], callback));
+    }
 }
 
 module.exports = IIODClient;
