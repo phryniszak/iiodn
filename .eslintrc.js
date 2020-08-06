@@ -25,5 +25,7 @@ module.exports = {
         ],
         "no-console": 0
     },
-    "globals": {}
+    "globals": {
+        "ParserError": true
+    }
 };

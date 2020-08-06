@@ -29,6 +29,7 @@ class IIODClient extends EventEmitter {
         this.connection_options = cnx_options;
         this.connected = false;
         this.ready = false;
+        this.closing = false;
 
         if (options.socket_keepalive === undefined) {
             options.socket_keepalive = true;
@@ -280,7 +281,7 @@ class IIODClient extends EventEmitter {
         var i = 0;
         var command_str = "";
         const args = command_obj.args;
-        const command = command_obj.command; // + "\r\n";
+        const command = command_obj.command;
         const len = args.length;
         const args_copy = new Array(len);
 
@@ -410,6 +411,53 @@ class IIODClient extends EventEmitter {
     //
     read(device, io, channel, attribute, callback) {
         return this.internal_send_command(new Command(COMMAND.READ, [device, io, channel, attribute], callback));
+    }
+
+    //
+    // READBUF <device> <bytes_count>
+    // Read raw data from the specified device
+    readbuf(device, bytes_count, callback) {
+        return this.internal_send_command(new Command(COMMAND.READBUF, [device, bytes_count], callback));
+    }
+
+    //
+    //
+    //
+    exit() {
+        this.internal_send_command(new Command(COMMAND.EXIT, [], null, null, false));
+
+        // Clear retry_timer
+        if (this.retry_timer) {
+            clearTimeout(this.retry_timer);
+            this.retry_timer = null;
+        }
+        this.stream.removeAllListeners();
+        this.stream.on("error", () => { });
+        this.connected = false;
+        this.ready = false;
+        this.closing = true;
+        return this.stream.destroySoon();
+    }
+
+    //
+    // OPEN <device> <samples_count> <mask> [CYCLIC]
+    // Open the specified device with the given mask of channels
+    //
+    // The “dev” parameter corresponds to the iio_device object that will be used.
+    // - The “samples_count” will set the size of the kernel's internal buffer. The value set should correspond to the amount
+    // of samples that will be asked in each read or write operation.
+    // - The “cyclic” variable is used to inform the kernel whether or not the device is to be opened in cyclic mode.
+    // In this configuration, the first buffer of samples pushed to the hardware will be repeated continuously.
+    // - "mask" - set to enable given channel
+    open(device, samples_count, mask, cyclic, callback) {
+
+        if (cyclic !== undefined && cyclic == true) {
+            cyclic = "CYCLIC";
+        } else {
+            cyclic = "";
+        }
+
+        return this.internal_send_command(new Command(COMMAND.OPEN, [device, samples_count, mask, cyclic], callback));
     }
 }
 
