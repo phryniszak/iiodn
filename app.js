@@ -5,6 +5,7 @@ const iiolib = require("./index");
 
 var options = {};
 options.host = "192.168.1.224";
+options.retry_on = false;
 const iio = new iiolib(options);
 
 iio.on("error", (error) => {
@@ -13,7 +14,7 @@ iio.on("error", (error) => {
 
 iio.on("ready", () => {
     console.log("ready");
-    
+
     // iio.version((error, replay) => console.log(replay));
 
     // iio.print((error, replayXML) => {
@@ -31,12 +32,12 @@ iio.on("ready", () => {
     //     iio.exit();
     // });
 
-    iio.open("iio:device0", 400, "00000010", false, (error, replay) => {
-        console.log(replay);
-        iio.readbuf("iio:device0", 400, (error, replay) => {
-            console.log(replay);
-        });
-    });
+    // iio.open("iio:device0", 400, "00000010", false, (error, replay) => {
+    //     console.log(replay);
+    //     iio.readbuf("iio:device0", 400, (error, replay) => {
+    //         console.log(replay);
+    //     });
+    // });
 });
 
 // iio.version(print);

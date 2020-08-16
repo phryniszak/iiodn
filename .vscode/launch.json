@@ -16,6 +16,25 @@
                 "DEBUG": "IIOD*"
             },
             "outputCapture": "std"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "Visualize sm",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/app_sm/visualize.js"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "app",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/app_sm/app.js"
         }
+
     ]
 }

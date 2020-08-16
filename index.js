@@ -24,6 +24,7 @@ class IIODClient extends EventEmitter {
         cnx_options.port = +options.port || 30431;
         cnx_options.host = options.host || "127.0.0.1";
         cnx_options.family = (!options.family && net.isIP(cnx_options.host)) || (options.family === "IPv6" ? 6 : 4);
+        cnx_options.timeout = +options.timeout || 1000;
 
         this.address = cnx_options.host + ":" + cnx_options.port;
         this.connection_options = cnx_options;
@@ -43,9 +44,11 @@ class IIODClient extends EventEmitter {
 
         // init retry
         this.retry_attempts = +options.retry_attempts || 10;
-        this.retry_timeout = +options.retry_timeout || 1000;
         this.retry_delay = +options.retry_delay || 200;
-        this.retry_on = (options.retry_on === "on") || true;
+        this.retry_on = !!options.retry_on;
+        if (options.retry_on === undefined) {
+            this.retry_on = true;
+        }
         this.initialize_retry_vars();
 
         this.options = options;
@@ -97,14 +100,6 @@ class IIODClient extends EventEmitter {
         }
 
         this.stream = net.createConnection(this.connection_options);
-
-        if (this.connect_timeout) {
-            this.stream.setTimeout(this.stream_timeout, () => {
-                // Note: This is only tested if a internet connection is established
-                this.retry_totaltime = this.stream_timeout;
-                this.connection_gone("timeout");
-            });
-        }
 
         this.stream.once("connect", () => {
             this.removeAllListeners("timeout");
@@ -174,7 +169,8 @@ class IIODClient extends EventEmitter {
             if (error) {
                 err.origin = error;
             }
-            // ??? this.end(false);
+
+            this.end(false);
             this.emit("error", err);
             return;
         }
@@ -425,18 +421,26 @@ class IIODClient extends EventEmitter {
     //
     exit() {
         this.internal_send_command(new Command(COMMAND.EXIT, [], null, null, false));
+        this.end();
+    }
 
+    //
+    //
+    //
+    end() {
         // Clear retry_timer
         if (this.retry_timer) {
             clearTimeout(this.retry_timer);
             this.retry_timer = null;
         }
+
         this.stream.removeAllListeners();
         this.stream.on("error", () => { });
         this.connected = false;
         this.ready = false;
         this.closing = true;
         return this.stream.destroySoon();
+
     }
 
     //
