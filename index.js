@@ -99,7 +99,9 @@ class IIODClient extends EventEmitter {
             this.stream.destroy();
         }
 
+        debug("Create stream");
         this.stream = net.createConnection(this.connection_options);
+        // this.stream.setTimeout(this.connection_options.timeout);
 
         this.stream.once("connect", () => {
             this.removeAllListeners("timeout");
@@ -109,7 +111,7 @@ class IIODClient extends EventEmitter {
 
         this.stream.on("data", (buffer_from_socket) => {
             // The buffer_from_socket.toString() has a significant impact on big chunks and therefore this should only be used if necessary
-            debug("Received " + this.address + " id " + IIODClient.connection_id + ": " + buffer_from_socket.toString());
+            debug(`Received ${this.address} id ${IIODClient.connection_id}: ${buffer_from_socket.toString().trim()} length: ${buffer_from_socket.length}`);
             this.reply_parser.execute(buffer_from_socket, this.command);
         });
 
@@ -317,7 +319,7 @@ class IIODClient extends EventEmitter {
 
         command_str += "\r\n";
 
-        debug(`Send ${this.address} id ${IIODClient.connection_id}: ${command_str}`);
+        debug(`Send ${this.address} id ${IIODClient.connection_id}: ${command_str.trim()}`);
         this.stream.write(command_str);
 
         // call write callback
@@ -340,23 +342,6 @@ class IIODClient extends EventEmitter {
     }
 
     return_reply(reply) {
-        // if (this.monitoring) {
-        //     var replyStr;
-        //     if (this.buffers && Buffer.isBuffer(reply)) {
-        //         replyStr = reply.toString();
-        //     } else {
-        //         replyStr = reply;
-        //     }
-        //     // If in monitor mode, all normal commands are still working and we only want to emit the streamlined commands
-        //     if (typeof replyStr === 'string' && utils.monitor_regex.test(replyStr)) {
-        //         var timestamp = replyStr.slice(0, replyStr.indexOf(' '));
-        //         var args = replyStr.slice(replyStr.indexOf('"') + 1, -1).split('" "').map(function (elem) {
-        //             return elem.replace(/\\"/g, '"');
-        //         });
-        //         this.emit('monitor', timestamp, args, replyStr);
-        //         return;
-        //     }
-        // }
 
         if (this.command) {
             if (typeof this.command.callback === "function") {
@@ -375,7 +360,7 @@ class IIODClient extends EventEmitter {
     // //////////////////////////////////////////////////////////////////////////////////////////////////
 
     //
-    //
+    // Get the version of libiio in use
     //
     version(callback) {
         return this.internal_send_command(new Command(COMMAND.VERSION, [], callback));

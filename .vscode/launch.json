@@ -34,7 +34,19 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/app_sm/app.js"
+        },
+        {
+            "type": "pwa-node",
+            "request": "launch",
+            "name": "app simple",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/app_simple/app.js",
+            "env": {
+                "DEBUG": "*"
+            },
+            "outputCapture": "std"
         }
-
     ]
 }
